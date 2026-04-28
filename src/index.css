@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  /* Branding Colors from your image */
+  --color-hanol-charcoal: #3D3D3D;
+  --color-hanol-red: #E20421;
+  --color-hanol-grey: #6D6D6D; /* Buttons */
+  --color-hanji-white: #FAF9F6; /* A slightly softer white */
+
+  /* Fonts */
+  --font-logo: "Poiret One", system-ui;
+  --font-primary: "Diphylleia", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+body {
+  color: var(--color-hanol-charcoal);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  background-repeat: repeat;
+  background-image: url('/src/assets/hanji-bg.png');
+  background-size: cover;
+  background-color: #FAF9F6; /* Fallback */
+  touch-action: manipulation;
+}
+
+@utility faked-bold {
+  text-shadow: 0.5px 0 0 currentColor, -0.5px 0 0 currentColor;
+}
+
+@keyframes pencilDraw {
+  from {
+    stroke-dashoffset: 400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.group:hover .path-animation {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: pencilDraw 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  filter: url(#pencil-filter) blur(0.2px);
+}
+
+.path-animation {
+  transition: stroke-dashoffset 0.8s ease;
+}
