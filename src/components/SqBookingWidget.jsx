@@ -8,21 +8,21 @@ const SqBookingWidget = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   // DELETE ONCE UP AND RUNNING
-  const isBookingDisabled = true;
+  // const isBookingDisabled = true;
 
-  if (isBookingDisabled) {
-    return (
-      <div className="w-full min-h-100 flex flex-col items-center justify-center text-center px-8 border border-hanol-charcoal/5 rounded-sm bg-white/30 backdrop-blur-sm">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-hanol-charcoal mb-4">
-          Status Update
-        </p>
-        <p className="text-[14px] font-primary text-hanol-charcoal/80 italic tracking-wide max-w-xs">
-          "Booking currently not available — business being set up at the moment."
-        </p>
-        <div className="mt-8 h-px w-12 bg-hanol-charcoal/20" />
-      </div>
-    );
-  }
+  // if (isBookingDisabled) {
+  //   return (
+  //     <div className="w-full min-h-100 flex flex-col items-center justify-center text-center px-8 border border-hanol-charcoal/5 rounded-sm bg-white/30 backdrop-blur-sm">
+  //       <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-hanol-charcoal mb-4">
+  //         Status Update
+  //       </p>
+  //       <p className="text-[14px] font-primary text-hanol-charcoal/80 italic tracking-wide max-w-xs">
+  //         "Booking currently not available — business being set up at the moment."
+  //       </p>
+  //       <div className="mt-8 h-px w-12 bg-hanol-charcoal/20" />
+  //     </div>
+  //   );
+  // }
   // DELETE ^ ONCE UP AND RUNNING
 
   useEffect(() => {

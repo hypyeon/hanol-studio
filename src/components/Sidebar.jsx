@@ -30,7 +30,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
     >
       <div className="flex flex-col h-full justify-between pt-32 pb-36 px-8 md:px-12">
         <ul className="flex flex-col gap-10 font-primary text-2xl tracking-wider text-hanol-charcoal">
-          {['services', 'booking', 'portfolio', 'contact'].map((item) => {
+          {['services', 'booking', 'portfolio', 'contact', 'blog'].map((item) => {
             const isActive = location.pathname === `/${item}`;
 
             return (

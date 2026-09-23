@@ -8,8 +8,10 @@ import Home from './pages/Home';
 import EyebrowQuiz from './pages/EyebrowQuiz';
 import Service from './pages/Services';
 import Booking from './pages/Booking';
+import BookingAPI from './pages/Booking-API';
 import Portfolio from './pages/Portfolio';
 import Contact from './pages/Contact';
+import Blog from './pages/Blog';
 
 export default function App() {
   const location = useLocation();
@@ -31,28 +33,32 @@ export default function App() {
         />
         <div className={`transition-all duration-700 ${isMenuOpen ? 'blur-sm grayscale-[0.2]' : 'blur-0'}`}>
           <AnimatePresence mode="wait">
-            <BrowserRouter basename="/hanol-studio">
-              <Routes location={location} key={location.pathname}>
-                <Route 
-                  path="/" 
-                  element={<PageTransition><Home /></PageTransition>} />
-                <Route 
-                  path="/quiz" 
-                  element={<PageTransition><EyebrowQuiz /></PageTransition>} />
-                <Route 
-                  path="/services" 
-                  element={<PageTransition><Service /></PageTransition>} />
-                <Route 
-                  path="/booking" 
-                  element={<PageTransition><Booking /></PageTransition>} />
-                <Route 
-                  path="/portfolio" 
-                  element={<PageTransition><Portfolio /></PageTransition>} />
-                <Route 
-                  path="/contact" 
-                  element={<PageTransition><Contact /></PageTransition>} />
-              </Routes>
-            </BrowserRouter>
+            <Routes location={location} key={location.pathname}>
+              <Route 
+                path="/" 
+                element={<PageTransition><Home /></PageTransition>} />
+              <Route 
+                path="/quiz" 
+                element={<PageTransition><EyebrowQuiz /></PageTransition>} />
+              <Route 
+                path="/services" 
+                element={<PageTransition><Service /></PageTransition>} />
+              <Route 
+                path="/booking" 
+                element={<PageTransition><Booking /></PageTransition>} />
+              <Route 
+                path="/booking-api" 
+                element={<PageTransition><BookingAPI /></PageTransition>} />
+              <Route 
+                path="/portfolio" 
+                element={<PageTransition><Portfolio /></PageTransition>} />
+              <Route 
+                path="/contact" 
+                element={<PageTransition><Contact /></PageTransition>} />
+              <Route 
+                path="/blog" 
+                element={<PageTransition><Blog /></PageTransition>} />
+            </Routes>
           </AnimatePresence>
         </div>
       </div>

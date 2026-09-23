@@ -8,11 +8,15 @@ import SqBookingWidget from '../components/SqBookingWidget';
 import { ChevronsRight, ChevronLeft, Loader2, ChevronsDown } from 'lucide-react';
 import { HeartStraightIcon } from "@phosphor-icons/react";
 import { bookingSteps } from '../data/bookingSteps';
+import { stepTitles } from '../data/bookingSteps';
 import { bookingRequest } from '../data/bookingRequest';
 import Toggle from '../components/Toggle';
 import { Link } from 'react-router-dom';
+import { Payment } from '../components/Payment';
+import Select from '../components/booking-steps/Select';
+import Form from '../components/booking-steps/Form';
 
-export default function Booking() {
+export default function BookingAPI() {
   const [checkedIds, setCheckedIds] = useState([]);
   const [checklistComplete, setChecklistComplete] = useState(false);
   const [openId, setOpenId] = useState(null);
@@ -20,6 +24,7 @@ export default function Booking() {
   const tabs = ['booking', 'faq'];
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const stepHeaderRef = useRef(null);
+  const [currentStep, setCurrentStep] = useState(1);
 
   const handleToggle = (id) => setOpenId(openId === id ? null : id);
 
@@ -65,6 +70,15 @@ export default function Booking() {
     }, 1200); // "preparing" phase
   };
 
+  useEffect(() => {
+    if (checkedIds.length === checklist.length && checklist.length > 0) {
+      const timer = setTimeout(() => {
+        setCurrentStep(2);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [checkedIds, checklist.length]);
+
   return (
     <main className="pt-26 md:portrait:pt-40 landscape:pt-36 pb-24 px-8 md:px-16 mx-auto flex flex-col lg:px-20 xl:px-30 lg:flex-row lg:justify-between lg:portrait:items-center lg:portrait:h-screen">
       <ScrollTransition />
@@ -78,18 +92,20 @@ export default function Booking() {
 
       {/* LEFT: FAQ */}
       <section className={`${activeTab === 'faq' ? 'block' : 'hidden'} landscape:block lg:portrait:block w-full lg:w-1/3 mb-16 landscape:mb-0`}>
-        <div className="space-y-2">
-          {faq.map((item) => (
-            <Accordion
-              key={item.id}
-              question={item.q}
-              answer={item.a}
-              linkText={item.linkText}
-              linkUrl={item.linkUrl}
-              isOpen={openId === item.id}
-              onToggle={() => handleToggle(item.id)}
-            />
-          ))}
+        <div className="landscape:sticky lg:portrait:sticky landscape:top-16 lg:portrait:top-8 self-start">
+          <div className="space-y-2">
+            {faq.map((item) => (
+              <Accordion
+                key={item.id}
+                question={item.q}
+                answer={item.a}
+                linkText={item.linkText}
+                linkUrl={item.linkUrl}
+                isOpen={openId === item.id}
+                onToggle={() => handleToggle(item.id)}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -100,13 +116,13 @@ export default function Booking() {
           <h2 className="hidden landscape:block lg:portrait:block text-[10px] uppercase tracking-[0.4em] opacity-60 mb-6 border-b border-hanol-charcoal/30 pb-1.5">
             Booking Process
           </h2>
-          <div className="flex flex-col justify-center px-1 border-hanol-charcoal/5">
-            <div className="flex flex-col gap-2 md:grid grid-cols-3 md:gap-4 relative">
+          <div className="flex flex-col justify-center border-hanol-charcoal/5">
+            <div className="flex flex-col gap-2 md:grid grid-cols-4 md:gap-3 relative">
               {bookingSteps.map((step, index) => {
                 const isLastStep = index === bookingSteps.length - 1;
                 // apply if isLastStep: "font-primary normal-case opacity-90 font-semibold text-[11px] md:portrait:mb-3"
                 return (
-                  <div key={step.id} className="flex flex-col relative text-center px-4 md:portrait:px-3 uppercase text-hanol-charcoal/80">
+                  <div key={step.id} className="flex flex-col relative text-center px-2 md:portrait:px-3 uppercase text-hanol-charcoal/80">
                     <p className="mb-2 text-[9px] underline underline-offset-4 tracking-[0.2em] leading-normal opacity-60">
                       {`Step 0${step.id}`}
                     </p>
@@ -136,18 +152,31 @@ export default function Booking() {
             </div>
           </div>
           <div className='mt-8 px-3'>
-            {bookingRequest.map((note, index) => {
-              return (
-                <div key={note.id} className="flex gap-2 justify-start text-hanol-charcoal/95">
-                  <div className='opacity-60'>
-                    <HeartStraightIcon size={14} weight="fill" className="text-hanol-red mt-0.5" />
-                  </div>
-                  <p className='font-primary text-[0.85rem] tracking-wide leading-4 mb-2'>
-                    {note.text}
-                  </p>
+            {bookingRequest.map((note) => (
+              <div key={note.id} className="flex gap-2 justify-start text-hanol-charcoal/95">
+                <div className="opacity-60">
+                  <HeartStraightIcon size={14} weight="fill" className="text-hanol-red mt-0.5" />
                 </div>
-              )
-            })}
+                <p className="font-primary text-[0.85rem] tracking-wide leading-4 mb-2">
+                  {note.linkUrl ? (
+                    <>
+                      {note.prefix}
+                      <a
+                        className="font-semibold underline underline-offset-1 decoration-dotted"
+                        href={note.linkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {note.linkText}
+                      </a>
+                      {note.suffix}
+                    </>
+                  ) : (
+                    note.text
+                  )}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
         {/* RIGHT-LEFT: Booking Widget */}
@@ -156,23 +185,35 @@ export default function Booking() {
           style={{ scrollMarginTop: '30px' }}
         >
           <div
-            className="text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6 border-b border-hanol-charcoal/30 pb-1.5 scroll-mt-32"
+            className="text-[12px] uppercase tracking-[0.17em] md:tracking-[0.3em] opacity-60 mb-6 border-b border-hanol-charcoal/80 pb-1.5 scroll-mt-32"
           >
             <h2>
               Step {' '}
               <AnimatePresence mode="wait">
                 <motion.span
-                  key={checklistComplete ? 'step2' : 'step1'}
+                  key={`step-num-${currentStep}`}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.3 }}
                   className="inline-block"
                 >
-                  {checklistComplete ? '2' : '1'}
+                  {currentStep}
                 </motion.span>
               </AnimatePresence>
-              {' '} of 3
+              {' '} of 4: {' '}
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={`step-title-${currentStep}`}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.3 }}
+                  className="inline-block font-bold"
+                >
+                  {stepTitles[currentStep]}
+                </motion.span>
+              </AnimatePresence>
             </h2>
           </div>
           <motion.div
@@ -181,10 +222,11 @@ export default function Booking() {
               layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
               opacity: { duration: 0.4 }
             }}
-            className="w-full bg-white/50 backdrop-blur-md rounded-4xl border border-hanol-charcoal/5 shadow-sm p-4 md:p-12"
+            className="w-full bg-white/50 backdrop-blur-md rounded-4xl border border-hanol-charcoal/5 shadow-sm md:py-4 px-0 md:p-10"
           >
             <AnimatePresence mode="wait">
-              {!checklistComplete ? (
+              {/* STEP 1: POLICIES CHECKLIST */}
+              {currentStep === 1 && (
                 <motion.div
                   key="step1"
                   initial={{ opacity: 0 }}
@@ -262,7 +304,19 @@ export default function Booking() {
                     </AnimatePresence>
                   </div>
                 </motion.div>
-              ) : (
+              )}
+              <button
+                onClick={() => {
+                  setCurrentStep(1);
+                  setCheckedIds([]);
+                }}
+                className="text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 hover:text-hanol-red transition-all flex cursor-pointer gap-2 md:pb-1 mb-0 md:mb-8 p-6 md:p-0"
+              >
+                <ChevronLeft size={12} />
+                Back
+              </button>
+              {/* STEP 2: SERVICE & SCHEDULE */}
+              {currentStep === 2 && (
                 <motion.div
                   key="step2"
                   initial={{ opacity: 0, x: 20 }}
@@ -271,34 +325,8 @@ export default function Booking() {
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="w-full h-full flex flex-col"
                 >
-                  {/* Header Section */}
-                  <div
-                    className="flex justify-between items-end mb-4 md:mb-8 p-4 md:p-0"
-                  >
-                    <div>
-                      <h3 className="text-[18px] font-primary tracking-[0.5px] text-hanol-charcoal">
-                        Select Service
-                      </h3>
-                      <p className="text-[11px] opacity-50 mt-2 w-[95%] md:w-[75%]">
-                        Choose your service to get started — you’ll be guided to a secure page to schedule and reserve your appointment.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setChecklistComplete(false);
-                        setCheckedIds([]);
-                      }}
-                      className="text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 hover:text-hanol-red transition-all flex items-center gap-2 md:pb-1 cursor-pointer"
-                    >
-                      <ChevronLeft size={12} />
-                      Back
-                    </button>
-                  </div>
-
                   {/* The Widget Wrapper */}
-                  <div className="relative w-full rounded-2xl border border-hanol-charcoal/5 bg-white/30 overflow-hidden shadow-inner min-h-125">
-                    {/* Loading State - Shown while Square script is loading */}
+                  <div className="relative w-full rounded-2xl bg-white/30 overflow-hidden min-h-125">
                     <AnimatePresence>
                       {isWidgetLoading && (
                         <motion.div
@@ -321,27 +349,61 @@ export default function Booking() {
                     </AnimatePresence>
 
                     <div className={`${isWidgetLoading ? "opacity-0" : "opacity-100 transition-opacity duration-1000"}`}>
-                      <SqBookingWidget />
-                    </div>
-
-                    <div className="hidden portrait:flex border-t border-hanol-charcoal/15 bg-white/50 p-4 flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-                      <div>
-                        <p className="text-[12px] font-medium tracking-wide text-hanol-charcoal">
-                          Unsure which session or technique fits your skin?
-                        </p>
-                        <p className="text-[11px] opacity-70 mt-0.75">
-                          Take our quick assessment for personalized recommendations.
-                        </p>
-                      </div>
-
-                      <Link
-                        to="/quiz"
-                        className="shrink-0 px-4 py-2 text-hanol-red/90 border bg-hanol-red/5 border-hanol-red/15 text-[10px] uppercase tracking-[0.15em] rounded-lg hover:bg-black transition-all shadow-xs"
-                      >
-                        Take 30-second Quiz ✦
-                      </Link>
+                      <Select 
+                        onServiceAndDateSelected={(selectedData) => {
+                        // Save selected service/slot details if needed
+                        setCurrentStep(3); // Advance to Jotform screening
+                      }} />
                     </div>
                   </div>
+                </motion.div>
+              )}
+              {/* STEP 3: MEDICAL SCREENING (JOTFORM) */}
+              {currentStep === 3 && (
+                <motion.div
+                  key="step3"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="w-full h-full flex flex-col"
+                >
+                  {/* Embedded Jotform Step */}
+                  <Form
+                    // formId="YOUR_JOTFORM_ID"
+                    onBack={() => setCurrentStep(2)}
+                    onFormComplete={() => setCurrentStep(4)}
+                  />
+                </motion.div>
+              )}
+
+              {/* STEP 4: DEPOSIT PAYMENT */}
+              {currentStep === 4 && (
+                <motion.div
+                  key="step4"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="w-full h-full flex flex-col"
+                >
+                  <div className="flex justify-between items-end mb-4 md:mb-8 p-4 md:p-0">
+                    <div>
+                      <h3 className="text-[18px] font-primary tracking-[0.5px] text-hanol-charcoal">
+                        Confirm & Pay Deposit
+                      </h3>
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentStep(3)}
+                      className="text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 hover:text-hanol-red transition-all flex items-center gap-2 md:pb-1 cursor-pointer"
+                    >
+                      <ChevronLeft size={12} />
+                      Back
+                    </button>
+                  </div>
+
+                  {/* Step 4 Payment Form Component Goes Here */}
                 </motion.div>
               )}
             </AnimatePresence>
